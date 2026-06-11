@@ -1,3 +1,5 @@
+// File: src/services/geminiService.js
+
 // This frontend service no longer talks directly to Gemini.
 // It sends the argument to our Vercel serverless function at /api/analyze.
 // This keeps the Gemini API key on the server side.
