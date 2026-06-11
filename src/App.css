@@ -575,3 +575,368 @@ button:hover:not(:disabled) {
     height: 520px;
   }
 }
+/* Upgrade: two-mode workspace and Exam Solver Mode */
+.mode-card {
+  grid-column: 1 / 3;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #e5e7eb;
+  border-radius: 26px;
+  padding: 26px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.mode-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.mode-button {
+  text-align: left;
+  border: 2px solid #dbe4f0;
+  background: #f8fafc;
+  color: #334155;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: none;
+}
+
+.mode-button span {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: #0f172a;
+}
+
+.mode-button small {
+  display: block;
+  color: #64748b;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.mode-button.active {
+  background: #eff6ff;
+  border-color: #2563eb;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+}
+
+.mode-button.active span {
+  color: #1d4ed8;
+}
+
+.student-answer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.student-answer-row label {
+  color: #334155;
+  font-weight: 900;
+}
+
+.student-answer-row select {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 900;
+  color: #0f172a;
+  background: white;
+}
+
+.exam-panel {
+  margin-top: 4px;
+}
+
+.exam-answer-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+  border: 1px solid #bfdbfe;
+  margin-bottom: 18px;
+}
+
+.exam-answer-card h3 {
+  margin: 0;
+  color: #166534;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.exam-meta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.exam-meta-stack span {
+  display: inline-block;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: white;
+  color: #1e40af;
+  font-size: 13px;
+  font-weight: 900;
+  border: 1px solid #dbeafe;
+}
+
+.feedback-box {
+  padding: 16px;
+  border-radius: 18px;
+  margin-bottom: 18px;
+  line-height: 1.55;
+}
+
+.feedback-box h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.feedback-box p {
+  margin: 0 0 8px 0;
+}
+
+.feedback-box p:last-child {
+  margin-bottom: 0;
+}
+
+.feedback-box.correct {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.feedback-box.incorrect {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+}
+
+.exam-section {
+  margin-top: 20px;
+}
+
+.exam-section h3,
+.exam-mini-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 17px;
+}
+
+.exam-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.exam-mini-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  line-height: 1.55;
+}
+
+.exam-mini-card p {
+  margin: 0;
+  color: #334155;
+}
+
+.exam-mini-card.teaching {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.exam-mini-card.improvement {
+  background: #fef3c7;
+  border-color: #fbbf24;
+}
+
+.step-list {
+  margin: 0;
+  padding-left: 22px;
+  color: #334155;
+  line-height: 1.65;
+}
+
+.step-list li {
+  margin-bottom: 8px;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.option-card {
+  padding: 15px;
+  border-radius: 17px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.option-card.correct {
+  background: #ecfdf5;
+  border-color: #22c55e;
+}
+
+.option-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.option-card-header strong {
+  color: #0f172a;
+}
+
+.option-card-header span {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: white;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid #e2e8f0;
+}
+
+.option-card.correct .option-card-header span {
+  color: #166534;
+  border-color: #86efac;
+}
+
+.option-text {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.option-card p {
+  margin: 0 0 8px 0;
+}
+
+.option-card p:last-child {
+  margin-bottom: 0;
+}
+
+.reasoning-map-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.reasoning-map-node {
+  padding: 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.reasoning-map-node strong {
+  color: #0f172a;
+}
+
+.reasoning-map-node span {
+  color: #334155;
+  line-height: 1.45;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reasoning-map-node.main {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.reasoning-map-node.answer {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.reasoning-map-node.warning,
+.reasoning-map-node.flaw {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.practice-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  line-height: 1.55;
+}
+
+.practice-card p {
+  margin: 0 0 10px 0;
+}
+
+.practice-skill {
+  color: #1e40af;
+}
+
+.practice-options {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.practice-options div {
+  padding: 10px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+.practice-answer {
+  display: inline-block;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+  .mode-card {
+    grid-column: 1 / 2;
+  }
+
+  .mode-selector,
+  .exam-section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-answer-card,
+  .student-answer-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .exam-meta-stack {
+    align-items: flex-start;
+  }
+}

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-function buildGeminiPrompt(argumentText) {
+function buildLogicPrompt(argumentText) {
   return `
 You are a logic and critical thinking expert.
 
@@ -119,6 +119,147 @@ ${argumentText}
 `;
 }
 
+function buildExamPrompt(questionText, studentAnswer) {
+  const cleanStudentAnswer = studentAnswer ? studentAnswer.toUpperCase() : "";
+
+  return `
+You are an expert Thinking Skills tutor for Selective School, Scholarship, Opportunity Class, Cambridge Thinking Skills, and verbal/problem-solving reasoning tests.
+
+The user will paste one exam-style multiple-choice Thinking Skills question. It may include a passage, rules, tables described in text, and options A, B, C, D.
+
+Your job is to solve the question AND teach the student how to solve that type next time.
+
+The app is designed for these question types:
+- Identifying Strengths: choose the option that best supports the argument.
+- Identifying Weaknesses: choose the option that most weakens the argument.
+- Evaluating Reasoning: decide whose reasoning is correct, or what can/cannot follow.
+- Identifying Mistakes / Flaws: identify the mistaken assumption or reasoning error.
+- Conditional Logic / Must Be True / Not Possible: convert rules into logical chains.
+- Matching Arguments: match the reasoning pattern, not the topic.
+- Assumption Questions: identify what must be assumed for the argument to work.
+- Argument Analysis: find the main conclusion, reasons, and hidden assumptions.
+- Numerical Problem Solving: show calculation steps for prices, ratios, schedules, counts, time, scores, tables, charts, and constraints.
+- Arrangement / Constraint Logic: build a small reasoning table or ordered list.
+- Venn / Set Logic: reason using groups, overlaps, all/some/no statements.
+- Visual or Spatial Reasoning: solve only if the text provides enough information. If an image/diagram is required but not described, say that the diagram is needed and give the best text-based guidance.
+
+Important output rules:
+- Return only raw valid JSON.
+- Do not include markdown.
+- Do not include backticks.
+- Do not include extra explanation outside JSON.
+- Do not omit fields.
+- Keep language simple and student-friendly.
+- Do not guess blindly. If the pasted question is incomplete, say what is missing.
+- The correct_answer must be one of "A", "B", "C", "D", or "Cannot determine".
+- Explain why the correct option is correct and why each wrong option is not the best.
+- If the student provided an answer, give feedback on their likely mistake and how to improve.
+- Generate one similar practice question of the same type after solving.
+- For visual/spatial questions, do not pretend to see a missing image unless the image is described in text.
+
+Student's selected answer:
+${cleanStudentAnswer || "No answer selected"}
+
+Return JSON in this exact structure:
+
+{
+  "mode": "exam",
+  "question_type": "Identifying Strengths",
+  "difficulty": "Easy",
+  "skill_tested": "Finding the option that best supports the main conclusion.",
+  "main_point": "The main conclusion or claim in the question.",
+  "key_rule_or_condition": "The key rule, condition, formula, or relationship needed to solve the question.",
+  "correct_answer": "A",
+  "confidence_score": 90,
+  "step_by_step_solution": [
+    "Step 1: Identify what the question is asking.",
+    "Step 2: Find the main point or rule.",
+    "Step 3: Compare each option with the main point.",
+    "Step 4: Choose the option that best satisfies the question."
+  ],
+  "option_analysis": [
+    {
+      "option": "A",
+      "text": "Option A text if available.",
+      "is_correct": true,
+      "explanation": "Why this option is correct or not correct."
+    },
+    {
+      "option": "B",
+      "text": "Option B text if available.",
+      "is_correct": false,
+      "explanation": "Why this option is correct or not correct."
+    },
+    {
+      "option": "C",
+      "text": "Option C text if available.",
+      "is_correct": false,
+      "explanation": "Why this option is correct or not correct."
+    },
+    {
+      "option": "D",
+      "text": "Option D text if available.",
+      "is_correct": false,
+      "explanation": "Why this option is correct or not correct."
+    }
+  ],
+  "student_feedback": {
+    "student_answer": "${cleanStudentAnswer}",
+    "is_student_correct": false,
+    "message": "Feedback comparing the student's answer with the correct answer.",
+    "likely_mistake": "The likely reasoning mistake the student made.",
+    "improvement_tip": "A specific tip to improve next time."
+  },
+  "teaching_tip": "General method for solving this question type.",
+  "score_improvement_tip": "One practical strategy to improve score in this question type.",
+  "reasoning_map": {
+    "nodes": [
+      {
+        "id": "n1",
+        "label": "Main Point",
+        "text": "Main point or rule here.",
+        "type": "main"
+      },
+      {
+        "id": "n2",
+        "label": "Correct Option",
+        "text": "Why the correct option works.",
+        "type": "answer"
+      }
+    ],
+    "edges": [
+      {
+        "from": "n1",
+        "to": "n2",
+        "label": "supports answer"
+      }
+    ]
+  },
+  "similar_practice_question": {
+    "question": "A new short practice question of the same type.",
+    "options": {
+      "A": "Option A",
+      "B": "Option B",
+      "C": "Option C",
+      "D": "Option D"
+    },
+    "correct_answer": "B",
+    "explanation": "Short explanation for the generated practice question.",
+    "skill_tested": "Same skill being practised."
+  }
+}
+
+If no student answer was selected:
+- student_feedback.student_answer must be ""
+- student_feedback.is_student_correct must be false
+- student_feedback.message must say "No answer was selected, so feedback is based on the correct solution only."
+- student_feedback.likely_mistake can explain a common trap for this question type.
+
+User's exam question:
+${questionText}
+`;
+}
+
 function cleanGeminiResponse(text) {
   let cleanedText = text.trim();
 
@@ -138,40 +279,50 @@ function cleanGeminiResponse(text) {
   return cleanedText;
 }
 
-function validateAnalysisData(data) {
-  if (!data || typeof data !== "object") {
-    throw new Error("Invalid analysis format");
-  }
-
-  if (!Array.isArray(data.premises)) {
-    throw new Error("Missing premises array");
-  }
-
-  if (!Array.isArray(data.assumptions)) {
-    throw new Error("Missing assumptions array");
-  }
-
-  if (!data.conclusion || typeof data.conclusion !== "object") {
-    throw new Error("Missing conclusion object");
-  }
-
-  if (!data.fallacy || typeof data.fallacy !== "object") {
-    throw new Error("Missing fallacy object");
-  }
-
-  if (typeof data.validity_score !== "number") {
-    throw new Error("Missing validity score");
-  }
-
-  if (!Array.isArray(data.graph_nodes)) {
-    throw new Error("Missing graph nodes array");
-  }
-
-  if (!Array.isArray(data.graph_edges)) {
-    throw new Error("Missing graph edges array");
-  }
-
+function validateLogicData(data) {
+  if (!data || typeof data !== "object") throw new Error("Invalid analysis format");
+  if (!Array.isArray(data.premises)) throw new Error("Missing premises array");
+  if (!Array.isArray(data.assumptions)) throw new Error("Missing assumptions array");
+  if (!data.conclusion || typeof data.conclusion !== "object") throw new Error("Missing conclusion object");
+  if (!data.fallacy || typeof data.fallacy !== "object") throw new Error("Missing fallacy object");
+  if (typeof data.validity_score !== "number") throw new Error("Missing validity score");
+  if (!Array.isArray(data.graph_nodes)) throw new Error("Missing graph nodes array");
+  if (!Array.isArray(data.graph_edges)) throw new Error("Missing graph edges array");
   return true;
+}
+
+function validateExamData(data) {
+  if (!data || typeof data !== "object") throw new Error("Invalid exam solution format");
+  if (!data.question_type) throw new Error("Missing question type");
+  if (!data.correct_answer) throw new Error("Missing correct answer");
+  if (!Array.isArray(data.step_by_step_solution)) throw new Error("Missing solution steps");
+  if (!Array.isArray(data.option_analysis)) throw new Error("Missing option analysis");
+  if (!data.student_feedback || typeof data.student_feedback !== "object") throw new Error("Missing student feedback");
+  if (!data.similar_practice_question || typeof data.similar_practice_question !== "object") throw new Error("Missing practice question");
+  return true;
+}
+
+async function callGemini(prompt, apiKey) {
+  const ai = new GoogleGenAI({ apiKey });
+
+  const geminiResponse = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
+
+  const rawText = geminiResponse.text;
+
+  if (!rawText) {
+    throw new Error("AI returned an empty response. Please try again.");
+  }
+
+  const cleanedText = cleanGeminiResponse(rawText);
+
+  try {
+    return JSON.parse(cleanedText);
+  } catch {
+    throw new Error("AI returned an unreadable response. Please try again.");
+  }
 }
 
 export default async function handler(request, response) {
@@ -191,53 +342,35 @@ export default async function handler(request, response) {
   }
 
   try {
-    const { argumentText } = request.body;
+    // Backward compatible support for the old frontend payload.
+    const mode = request.body?.mode || "logic";
+    const inputText = request.body?.inputText || request.body?.argumentText || "";
+    const studentAnswer = request.body?.studentAnswer || "";
 
-    if (!argumentText || !argumentText.trim()) {
+    if (!inputText || !inputText.trim()) {
       return response.status(400).json({
-        error: "Please enter an argument first.",
+        error: mode === "exam" ? "Please enter a Thinking Skills question first." : "Please enter an argument first.",
       });
     }
 
-    if (argumentText.length > 3000) {
+    const maxLength = mode === "exam" ? 6000 : 3000;
+
+    if (inputText.length > maxLength) {
       return response.status(400).json({
-        error: "This argument is very long. Try shortening it for better analysis.",
+        error: `This input is very long. Please keep it under ${maxLength} characters for better analysis.`,
       });
     }
 
-    const ai = new GoogleGenAI({
-      apiKey: apiKey,
-    });
-
-    const prompt = buildGeminiPrompt(argumentText);
-
-    const geminiResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
-
-    const rawText = geminiResponse.text;
-
-    if (!rawText) {
-      return response.status(502).json({
-        error: "AI returned an empty response. Please try again.",
-      });
+    if (mode === "exam") {
+      const prompt = buildExamPrompt(inputText, studentAnswer);
+      const parsedData = await callGemini(prompt, apiKey);
+      validateExamData(parsedData);
+      return response.status(200).json(parsedData);
     }
 
-    const cleanedText = cleanGeminiResponse(rawText);
-
-    let parsedData;
-
-    try {
-      parsedData = JSON.parse(cleanedText);
-    } catch {
-      return response.status(502).json({
-        error: "AI returned an unreadable response. Please try again.",
-      });
-    }
-
-    validateAnalysisData(parsedData);
-
+    const prompt = buildLogicPrompt(inputText);
+    const parsedData = await callGemini(prompt, apiKey);
+    validateLogicData(parsedData);
     return response.status(200).json(parsedData);
   } catch (error) {
     const errorMessage = error.message || "";
@@ -245,6 +378,17 @@ export default async function handler(request, response) {
     if (errorMessage.includes("429") || errorMessage.toLowerCase().includes("rate")) {
       return response.status(429).json({
         error: "Too many requests. Wait for a minute and try again.",
+      });
+    }
+
+    if (
+      errorMessage.includes("unreadable") ||
+      errorMessage.includes("empty response") ||
+      errorMessage.includes("Missing") ||
+      errorMessage.includes("Invalid")
+    ) {
+      return response.status(502).json({
+        error: errorMessage,
       });
     }
 
